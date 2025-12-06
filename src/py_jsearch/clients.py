@@ -158,13 +158,9 @@ class JSearchAsyncClient:
             try:
                 response_data = response.json()
                 logger.debug(f"API response JSON: {response_data}")
-                if response_model is None:
-                    logger.debug("Returning `APIResponse` with raw data")
-                    api_response = response_model.model_validate(response_data)
-                else:
-                    model_name = getattr(data_model, "__name__", str(data_model))
-                    logger.debug(f"Parsing response into `APIResponse[{model_name}]`")
-                    api_response = response_model.model_validate(response_data)
+                model_name = getattr(data_model, "__name__", str(data_model))
+                logger.debug(f"Parsing response into `APIResponse[{model_name}]`")
+                api_response = response_model.model_validate(response_data)
 
                 # Check status after parsing
                 if api_response.status.lower() != "ok":
@@ -485,12 +481,8 @@ class JSearchClient:
                 logger.debug(f"API response JSON: {response_data}")
 
                 model_name = getattr(data_model, "__name__", str(data_model))
-                if response_model is None:
-                    logger.debug("Returning `APIResponse` with raw data")
-                    api_response = response_model.model_validate(response_data)
-                else:
-                    logger.debug(f"Parsing response into `APIResponse[{model_name}]`")
-                    api_response = response_model.model_validate(response_data)
+                logger.debug(f"Parsing response into `APIResponse[{model_name}]`")
+                api_response = response_model.model_validate(response_data)
 
                 # Check status after parsing
                 if api_response.status.lower() != "ok":
