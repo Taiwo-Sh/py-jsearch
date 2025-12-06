@@ -1,5 +1,10 @@
 # py-jsearch
 
+[![Test](https://github.com/Taiwo-Sh/py-jsearch/actions/workflows/test.yaml/badge.svg)](https://github.com/Taiwo-Sh/py-jsearch/actions/workflows/test.yaml)
+[![Code Quality](https://github.com/Taiwo-Sh/py-jsearch/actions/workflows/code-quality.yaml/badge.svg)](https://github.com/Taiwo-Sh/py-jsearch/actions/workflows/code-quality.yaml)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An unofficial Python client for the [JSearch API](https://openwebninja.com/api/jsearch) by Open Web Ninja. Search for jobs, get job details, and retrieve salary estimates with a clean, type-safe interface.
 
 ## Features
