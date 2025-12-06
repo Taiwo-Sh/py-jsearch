@@ -1,10 +1,8 @@
-"""Shared fixtures and configuration for pytest."""
-
 import typing
 
+from httpx import Response
 import pytest
 import respx
-from httpx import Response
 
 from py_jsearch import JSearchAsyncClient, JSearchClient
 
@@ -124,7 +122,7 @@ def sample_job_data() -> typing.Dict[str, typing.Any]:
 
 @pytest.fixture
 def mock_search_response(
-    mock_job_data: typing.Dict[str, typing.Any],
+    sample_job_data: typing.Dict[str, typing.Any],
 ) -> typing.Dict[str, typing.Any]:
     """Sample job search API response."""
     return {
@@ -138,20 +136,20 @@ def mock_search_response(
             "country": "us",
             "language": "en",
         },
-        "data": [mock_job_data],
+        "data": [sample_job_data],
     }
 
 
 @pytest.fixture
 def mock_job_details_response(
-    mock_job_data: typing.Dict[str, typing.Any],
+    sample_job_data: typing.Dict[str, typing.Any],
 ) -> typing.Dict[str, typing.Any]:
     """Sample job details API response."""
     return {
         "status": "OK",
         "request_id": "test-request-456",
         "parameters": {"job_id": "test_job_123", "country": "us"},
-        "data": [mock_job_data],
+        "data": [sample_job_data],
     }
 
 
@@ -296,3 +294,20 @@ def mock_auth_error_router(base_url: str) -> respx.MockRouter:
         return_value=Response(401, json=error_response)
     )
     return router
+
+
+# Aliases for backward compatibility
+@pytest.fixture
+def sample_salary_data(
+    mock_salary_data: typing.Dict[str, typing.Any],
+) -> typing.Dict[str, typing.Any]:
+    """Alias for mock_salary_data."""
+    return mock_salary_data
+
+
+@pytest.fixture
+def sample_company_salary_data(
+    mock_company_salary_data: typing.Dict[str, typing.Any],
+) -> typing.Dict[str, typing.Any]:
+    """Alias for mock_company_salary_data."""
+    return mock_company_salary_data

@@ -43,6 +43,7 @@ markers = [
     "integration: Integration tests",
     "async_test: Async tests",
 ]
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.coverage.run]
 source = ["src/py_jsearch"]

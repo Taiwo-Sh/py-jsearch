@@ -2,9 +2,9 @@
 
 from typing import Any, Dict
 
+from httpx import Response
 import pytest
 import respx
-from httpx import Response
 
 from py_jsearch import (
     CompanySalarySearchParams,
@@ -21,25 +21,25 @@ from py_jsearch import (
 class TestJSearchClientInit:
     """Test client initialization."""
 
-    def test_init_with_api_key(self, api_key: str):
+    def test_init_with_api_key(self, api_key: str) -> None:
         """Test client initialization with API key."""
         client = JSearchClient(access_key=api_key)
         assert client.access_key == api_key
         assert client.base_url == "https://api.openwebninja.com/jsearch"
         assert client._session is None
 
-    def test_init_with_custom_base_url(self, api_key: str):
+    def test_init_with_custom_base_url(self, api_key: str) -> None:
         """Test client initialization with custom base URL."""
         custom_url = "https://custom.api.com"
         client = JSearchClient(access_key=api_key, base_url=custom_url)
         assert client.base_url == custom_url
 
-    def test_init_with_timeout(self, api_key: str):
+    def test_init_with_timeout(self, api_key: str) -> None:
         """Test client initialization with custom timeout."""
         client = JSearchClient(access_key=api_key, timeout=60.0)
         assert client.timeout == 60.0
 
-    def test_get_headers(self, api_key: str):
+    def test_get_headers(self, api_key: str) -> None:
         """Test headers generation."""
         client = JSearchClient(access_key=api_key)
         headers = client.get_headers()
@@ -49,7 +49,7 @@ class TestJSearchClientInit:
         assert headers["Authorization"] == f"Bearer {api_key}"
         assert headers["x-api-key"] == api_key
 
-    def test_session_lazy_initialization(self, api_key: str):
+    def test_session_lazy_initialization(self, api_key: str) -> None:
         """Test session is lazily initialized."""
         client = JSearchClient(access_key=api_key)
         assert client._session is None
@@ -59,7 +59,7 @@ class TestJSearchClientInit:
         assert session is not None
         assert client._session is session
 
-    def test_context_manager(self, api_key: str):
+    def test_context_manager(self, api_key: str) -> None:
         """Test context manager usage."""
         with JSearchClient(access_key=api_key) as client:
             assert client.access_key == api_key
@@ -114,8 +114,8 @@ class TestJSearchClientSearchJobs:
                     num_pages=2,
                     date_posted="week",
                     work_from_home=True,
-                    employment_types=["FULLTIME", "CONTRACTOR"],
-                    job_requirements=["under_3_years_experience"],
+                    employment_types=["FULLTIME", "CONTRACTOR"],  # type: ignore[list-item]
+                    job_requirements=["under_3_years_experience"],  # type: ignore[list-item]
                     country="us",
                 )
 
@@ -126,7 +126,7 @@ class TestJSearchClientSearchJobs:
         self,
         api_key: str,
         base_url: str,
-    ):
+    ) -> None:
         """Test job search with empty results."""
         empty_response = {
             "status": "OK",
@@ -470,12 +470,12 @@ class TestJSearchClientErrorHandling:
 class TestJobSearchParams:
     """Test JobSearchParams model."""
 
-    def test_required_query(self):
+    def test_required_query(self) -> None:
         """Test query parameter is required."""
         with pytest.raises(Exception):  # Pydantic validation error
             JobSearchParams()  # type: ignore
 
-    def test_as_query_params(self):
+    def test_as_query_params(self) -> None:
         """Test conversion to query parameters."""
         params = JobSearchParams(
             query="python developer",
@@ -483,8 +483,8 @@ class TestJobSearchParams:
             num_pages=3,
             date_posted="week",
             work_from_home=True,
-            employment_types=["FULLTIME", "CONTRACTOR"],
-            job_requirements=["under_3_years_experience"],
+            employment_types=["FULLTIME", "CONTRACTOR"],  # type: ignore
+            job_requirements=["under_3_years_experience"],  # type: ignore
             country="us",
             language="en",
         )
@@ -501,7 +501,7 @@ class TestJobSearchParams:
         assert query_params["country"] == "us"
         assert query_params["language"] == "en"
 
-    def test_exclude_job_publishers(self):
+    def test_exclude_job_publishers(self) -> None:
         """Test exclude_job_publishers parameter."""
         params = JobSearchParams(
             query="test",
@@ -511,7 +511,7 @@ class TestJobSearchParams:
         query_params = params.as_query_params()
         assert query_params["exclude_job_publishers"] == "Indeed,ZipRecruiter"
 
-    def test_fields_projection(self):
+    def test_fields_projection(self) -> None:
         """Test fields parameter."""
         params = JobSearchParams(
             query="test",

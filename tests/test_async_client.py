@@ -1,10 +1,8 @@
-"""Tests for JSearchAsyncClient (asynchronous client)."""
-
 from typing import Any, Dict
 
+from httpx import Response
 import pytest
 import respx
-from httpx import Response
 
 from py_jsearch import (
     CompanySalarySearchParams,
@@ -41,7 +39,7 @@ class TestJSearchAsyncClientInit:
         """Test async context manager usage."""
         async with JSearchAsyncClient(access_key=api_key) as client:
             assert client.access_key == api_key
-        
+
         # Session should be closed after context
         if client._session is not None:
             assert client._session.is_closed
@@ -63,12 +61,12 @@ class TestJSearchAsyncClientSearchJobs:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(200, json=mock_search_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSearchParams(query="python developer")
                 jobs_iterator = await client.search_jobs(params)
                 jobs = list(jobs_iterator)
-                
+
                 assert len(jobs) == 1
                 assert jobs[0].job_title == "Senior Python Developer"
                 assert jobs[0].employer_name == "Tech Corp"
@@ -85,15 +83,15 @@ class TestJSearchAsyncClientSearchJobs:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(200, json=mock_search_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSearchParams(
                     query="python developer",
                     work_from_home=True,
-                    employment_types=["FULLTIME"],
+                    employment_types=["FULLTIME"],  # type: ignore
                     date_posted="week",
                 )
-                
+
                 jobs_iterator = await client.search_jobs(params)
                 jobs = list(jobs_iterator)
                 assert len(jobs) >= 0
@@ -110,12 +108,12 @@ class TestJSearchAsyncClientSearchJobs:
             "parameters": {"query": "nonexistent job"},
             "data": [],
         }
-        
+
         with respx.mock:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(200, json=empty_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSearchParams(query="nonexistent job")
                 jobs_iterator = await client.search_jobs(params)
@@ -139,11 +137,11 @@ class TestJSearchAsyncClientGetJob:
             respx.get(f"{base_url}/job-details").mock(
                 return_value=Response(200, json=mock_job_details_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobDetailsParams(job_id="test_job_123")
                 job = await client.get_job(params)
-                
+
                 assert job is not None
                 assert job.job_id == "test_job_123"
                 assert job.job_title == "Senior Python Developer"
@@ -160,12 +158,12 @@ class TestJSearchAsyncClientGetJob:
             "parameters": {"job_id": "nonexistent"},
             "data": [],
         }
-        
+
         with respx.mock:
             respx.get(f"{base_url}/job-details").mock(
                 return_value=Response(200, json=empty_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobDetailsParams(job_id="nonexistent")
                 job = await client.get_job(params)
@@ -188,14 +186,14 @@ class TestJSearchAsyncClientGetSalary:
             respx.get(f"{base_url}/estimated-salary").mock(
                 return_value=Response(200, json=mock_salary_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSalarySearchParams(
                     job_title="Python Developer",
                     location="San Francisco",
                 )
                 salary = await client.get_job_salary(params)
-                
+
                 assert salary is not None
                 assert salary.job_title == "Python Developer"
                 assert salary.median_salary == 140000.0
@@ -211,7 +209,7 @@ class TestJSearchAsyncClientGetSalary:
             respx.get(f"{base_url}/estimated-salary").mock(
                 return_value=Response(200, json=mock_salary_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSalarySearchParams(
                     job_title="Python Developer",
@@ -220,7 +218,7 @@ class TestJSearchAsyncClientGetSalary:
                     years_of_experience="FOUR_TO_SIX",
                 )
                 salary = await client.get_job_salary(params)
-                
+
                 assert salary is not None
 
 
@@ -240,14 +238,14 @@ class TestJSearchAsyncClientGetCompanySalary:
             respx.get(f"{base_url}/company-job-salary").mock(
                 return_value=Response(200, json=mock_company_salary_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = CompanySalarySearchParams(
                     company="Google",
                     job_title="Software Engineer",
                 )
                 salary = await client.get_company_salary(params)
-                
+
                 assert salary is not None
                 assert salary.company == "Google"
                 assert salary.job_title == "Software Engineer"
@@ -270,15 +268,15 @@ class TestJSearchAsyncClientErrorHandling:
             "parameters": {},
             "data": [],
         }
-        
+
         with respx.mock:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(401, json=error_response)
             )
-            
+
             async with JSearchAsyncClient(access_key="invalid-key") as client:
                 params = JobSearchParams(query="test")
-                
+
                 with pytest.raises(JSearchAuthError):
                     await client.search_jobs(params)
 
@@ -292,10 +290,10 @@ class TestJSearchAsyncClientErrorHandling:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(500, json={"error": "Internal Server Error"})
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSearchParams(query="test")
-                
+
                 with pytest.raises(JSearchClientError):
                     await client.search_jobs(params)
 
@@ -311,15 +309,15 @@ class TestJSearchAsyncClientErrorHandling:
             "parameters": {},
             "data": [],
         }
-        
+
         with respx.mock:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(200, json=error_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 params = JobSearchParams(query="test")
-                
+
                 with pytest.raises(JSearchClientError, match="Invalid response status"):
                     await client.search_jobs(params)
 
@@ -337,21 +335,19 @@ class TestAsyncConcurrentRequests:
     ):
         """Test multiple concurrent job searches."""
         import asyncio
-        
+
         with respx.mock:
             respx.get(f"{base_url}/search").mock(
                 return_value=Response(200, json=mock_search_response)
             )
-            
+
             async with JSearchAsyncClient(access_key=api_key) as client:
                 queries = ["python developer", "data scientist", "devops engineer"]
-                
-                tasks = [
-                    client.search_jobs(JobSearchParams(query=q)) for q in queries
-                ]
-                
+
+                tasks = [client.search_jobs(JobSearchParams(query=q)) for q in queries]
+
                 results = await asyncio.gather(*tasks)
-                
+
                 assert len(results) == 3
                 for result in results:
                     jobs = list(result)

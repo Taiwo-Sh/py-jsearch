@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import time
 import typing
 import warnings
 
@@ -274,12 +275,12 @@ class JSearchAsyncClient:
         )
 
         job_data = result.data
-        if not isinstance(job_data, list) or len(job_data) == 0:
-            logger.error("Invalid job data format")
+        if not isinstance(job_data, list):
+            logger.error("Invalid job data format - expected list")
             raise JSearchClientError("Invalid job data format in response")
 
-        if not job_data:
-            logger.debug("")
+        if len(job_data) == 0:
+            logger.debug("No job found with the given job_id")
             return None
 
         job = job_data[0]
@@ -439,8 +440,6 @@ class JSearchClient:
         :param kwargs: Additional arguments to pass to httpx.Client.request().
         :return: An APIResponse instance containing the API response data.
         """
-        import time
-
         logger.debug(f"Making {_method} request to {url} with {len(params)} parameters")
         start_time = time.time()
 
